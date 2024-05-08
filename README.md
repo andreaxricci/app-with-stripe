@@ -9,7 +9,7 @@ The all-in-one starter kit for high-performance SaaS applications.
 - Integration with [Stripe Checkout](https://stripe.com/docs/payments/checkout) and the [Stripe customer portal](https://stripe.com/docs/billing/subscriptions/customer-portal)
 - Automatic syncing of pricing plans and subscription statuses via [Stripe webhooks](https://stripe.com/docs/webhooks)
 
-## Demo
+## Demo.
 
 - https://subscription-payments.vercel.app/
 
