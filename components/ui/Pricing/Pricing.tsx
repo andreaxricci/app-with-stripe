@@ -81,6 +81,13 @@ export default function Pricing({ user, products, subscription }: Props) {
     setPriceIdLoading(undefined);
   };
 
+  const filteredPrices = products.flatMap((product) =>
+    product.prices?.filter(
+      (price) => price?.type === 'one_time' || price?.interval === billingInterval
+    )
+  );
+
+
   if (!products.length) {
     return (
       <section className="bg-black">
@@ -111,8 +118,7 @@ export default function Pricing({ user, products, subscription }: Props) {
               Pricing Plans
             </h1>
             <p className="max-w-2xl m-auto mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl">
-              Start building for free, then add a site plan to go live. Account
-              plans unlock additional features.
+              Start building your personalized memes.
             </p>
             <div className="relative self-center mt-6 bg-zinc-900 rounded-lg p-0.5 flex sm:mt-8 border border-zinc-800">
               {intervals.includes('month') && (
@@ -144,11 +150,8 @@ export default function Pricing({ user, products, subscription }: Props) {
             </div>
           </div>
           <div className="mt-12 space-y-4 sm:mt-16 sm:space-y-0 flex flex-wrap justify-center gap-6 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:mx-0">
-            {products.map((product) => {
-              const price = product?.prices?.find(
-                (price) => price.interval === billingInterval
-              );
-              if (!price) return null;
+            {filteredPrices.map((price) => {
+              const product = products.find((p) => p.prices.includes(price));
               const priceString = new Intl.NumberFormat('en-US', {
                 style: 'currency',
                 currency: price.currency!,
@@ -156,13 +159,13 @@ export default function Pricing({ user, products, subscription }: Props) {
               }).format((price?.unit_amount || 0) / 100);
               return (
                 <div
-                  key={product.id}
+                  key={price.id}
                   className={cn(
                     'flex flex-col rounded-lg shadow-sm divide-y divide-zinc-600 bg-zinc-900',
                     {
                       'border border-pink-500': subscription
-                        ? product.name === subscription?.prices?.products?.name
-                        : product.name === 'Freelancer'
+                        ? product?.name === subscription?.prices?.products?.name
+                        : product?.name === 'Freelancer'
                     },
                     'flex-1', // This makes the flex item grow to fill the space
                     'basis-1/3', // Assuming you want each card to take up roughly a third of the container's width
@@ -171,15 +174,15 @@ export default function Pricing({ user, products, subscription }: Props) {
                 >
                   <div className="p-6">
                     <h2 className="text-2xl font-semibold leading-6 text-white">
-                      {product.name}
+                      {product?.name}
                     </h2>
-                    <p className="mt-4 text-zinc-300">{product.description}</p>
+                    <p className="mt-4 text-zinc-300">{product?.description}</p>
                     <p className="mt-8">
                       <span className="text-5xl font-extrabold white">
                         {priceString}
                       </span>
                       <span className="text-base font-medium text-zinc-100">
-                        /{billingInterval}
+                        /{price.type === 'one_time' ? 'One Time' : billingInterval}
                       </span>
                     </p>
                     <Button
