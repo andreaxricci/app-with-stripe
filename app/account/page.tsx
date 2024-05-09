@@ -40,7 +40,7 @@ export default async function Account() {
             Account
           </h1>
           <p className="max-w-2xl m-auto mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl">
-            We partnered with Stripe for a simplified billing.
+            Hello world.
           </p>
         </div>
       </div>
