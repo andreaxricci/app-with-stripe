@@ -9,13 +9,18 @@ export default async function Navbar() {
     data: { user }
   } = await supabase.auth.getUser();
 
+  const { data: userDetails } = await supabase
+    .from('users')
+    .select('*')
+    .single();
+
   return (
     <nav className={s.root}>
       <a href="#skip" className="sr-only focus:not-sr-only">
         Skip to content
       </a>
       <div className="max-w-6xl px-6 mx-auto">
-        <Navlinks user={user} />
+        <Navlinks user={user} credits={userDetails?.credits ?? 0}/>
       </div>
     </nav>
   );

@@ -3,6 +3,7 @@ export const runtime = 'edge'
 import CustomerPortalForm from '@/components/ui/AccountForms/CustomerPortalForm';
 import EmailForm from '@/components/ui/AccountForms/EmailForm';
 import NameForm from '@/components/ui/AccountForms/NameForm';
+import CreditsForm from '@/components/ui/AccountForms/CreditsForm';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
@@ -45,7 +46,8 @@ export default async function Account() {
         </div>
       </div>
       <div className="p-4">
-        <CustomerPortalForm subscription={subscription} />
+        {/* <CustomerPortalForm subscription={subscription} /> */}
+        <CreditsForm credits={userDetails?.credits ?? 0} />
         <NameForm userName={userDetails?.full_name ?? ''} />
         <EmailForm userEmail={user.email} />
       </div>

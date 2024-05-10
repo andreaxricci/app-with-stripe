@@ -10,7 +10,10 @@ create table users (
   -- The customer's billing address, stored in JSON format.
   billing_address jsonb,
   -- Stores your customer's payment instruments.
-  payment_method jsonb
+  payment_method jsonb,
+  -- Stores your customer's payment instruments.
+  credits integer
+
 );
 alter table users enable row level security;
 create policy "Can view own user data." on users for select using (auth.uid() = id);

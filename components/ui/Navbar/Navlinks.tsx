@@ -10,9 +10,10 @@ import s from './Navbar.module.css';
 
 interface NavlinksProps {
   user?: any;
+  credits?: number;
 }
 
-export default function Navlinks({ user }: NavlinksProps) {
+export default function Navlinks({ user, credits }: NavlinksProps) {
   const router = getRedirectMethod() === 'client' ? useRouter() : null;
 
   return (
@@ -26,20 +27,25 @@ export default function Navlinks({ user }: NavlinksProps) {
             Pricing
           </Link>
           {user && (
+            
             <Link href="/account" className={s.link}>
               Account
             </Link>
+            
           )}
         </nav>
       </div>
+      {user ? ( <div> Credits available: {credits} </div> ) : <div></div>} 
       <div className="flex justify-end space-x-8">
         {user ? (
+          
           <form onSubmit={(e) => handleRequest(e, SignOut, router)}>
             <input type="hidden" name="pathName" value={usePathname()} />
             <button type="submit" className={s.link}>
               Sign out
             </button>
           </form>
+          
         ) : (
           <Link href="/signin" className={s.link}>
             Sign In
