@@ -41,14 +41,14 @@ export default async function Account() {
             Account
           </h1>
           <p className="max-w-2xl m-auto mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl">
-            Hello world.
+            Available credits: {userDetails?.credits ?? 0}
           </p>
         </div>
       </div>
       <div className="p-4">
-        {/* <CustomerPortalForm subscription={subscription} /> */}
+        {/* <CustomerPortalForm subscription={subscription} /> 
         <CreditsForm credits={userDetails?.credits ?? 0} />
-        <NameForm userName={userDetails?.full_name ?? ''} />
+        <NameForm userName={userDetails?.full_name ?? ''} /> */}
         <EmailForm userEmail={user.email} />
       </div>
     </section>

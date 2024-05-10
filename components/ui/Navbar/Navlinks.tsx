@@ -23,19 +23,17 @@ export default function Navlinks({ user, credits }: NavlinksProps) {
           <Logo />
         </Link>
         <nav className="ml-6 space-x-2 lg:block">
-          <Link href="/" className={s.link}>
-            Pricing
+          <Link href="/pricing" className={s.link}>
+            Buy credits
           </Link>
           {user && (
-            
             <Link href="/account" className={s.link}>
               Account
             </Link>
-            
           )}
         </nav>
       </div>
-      {user ? ( <div> Credits available: {credits} </div> ) : <div></div>} 
+      {/*  {user ? ( <div> Credits available: {credits} </div> ) : <div></div>}  */}
       <div className="flex justify-end space-x-8">
         {user ? (
           

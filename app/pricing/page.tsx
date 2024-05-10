@@ -1,9 +1,9 @@
 export const runtime = 'edge'
 
-import Homepage from '@/components/ui/Homepage/Homepage';
+import Pricing from '@/components/ui/Pricing/Pricing';
 import { createClient } from '@/utils/supabase/server';
 
-export default async function Home() {
+export default async function PricingPage() {
   const supabase = createClient();
 
   const {
@@ -29,9 +29,10 @@ export default async function Home() {
     .order('unit_amount', { referencedTable: 'prices' });
 
   return (
-      <Homepage
-        
-      />
-      
-      );
+    <Pricing
+      user={user}
+      products={products ?? []}
+      subscription={subscription}
+    />
+  );
 }
