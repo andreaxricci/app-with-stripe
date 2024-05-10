@@ -9,7 +9,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 interface Prediction {
   id: string;
-  output: string[];
+  output: string;
   status: string;
   detail?: string;
 }
@@ -118,8 +118,7 @@ export default function Face2MemeClient() {
         return;
       }
       setPrediction(prediction);
-      console.log("Prediction: ", prediction)
-      console.log("Prediction output: ", prediction.output)
+
     }
   };
 
@@ -248,7 +247,7 @@ export default function Face2MemeClient() {
           
             {prediction.output && (
               <div className="mt-4 mb-4 flex flex-col items-center justify-center gap-4 overflow-hidden">
-              <div className={styles.imageWrapper}>
+              <div >
                   <Image
                   fill
                   src={prediction.output}
