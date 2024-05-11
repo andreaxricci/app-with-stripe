@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
+import { saveAs } from 'file-saver'; 
 import styles from "./Face2Meme.module.css"
 import Button from "@/components/ui/Button"
 
@@ -9,9 +9,9 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 interface Prediction {
   id: string;
-  output: string;
+  output: any;
   status: string;
-  detail?: string;
+  detail?: any;
 }
 
 export default function Face2MemeClient() {
@@ -22,6 +22,7 @@ export default function Face2MemeClient() {
   const [selectedImage, setSelectedImage] = useState<File | undefined>();
   const [selectedSecondImage, setSelectedSecondImage] = useState<File | undefined>();
   const secondImageRef = useRef<HTMLDivElement | null>(null);
+  const predictionRef = useRef<HTMLDivElement | null>(null);
 
   // This function will be triggered when the file field change
   const imageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,6 +35,7 @@ export default function Face2MemeClient() {
   const secondImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedSecondImage(e.target.files[0]);
+      scrollToRef(predictionRef);
     }
   };
 
@@ -56,9 +58,9 @@ export default function Face2MemeClient() {
   };
 
   const handleDownload = () => {
-    const imageUrl = prediction?.output[prediction.output.length - 1];
+    const imageUrl = prediction?.output;
     if (imageUrl) {
-    {/* saveAs(imageUrl, 'image.jpg'); */} 
+      saveAs(imageUrl, 'image.jpg');
     }
   };
 
@@ -96,7 +98,7 @@ export default function Face2MemeClient() {
       }),
     });
 
-    let prediction = await response.json() as Prediction;
+    let prediction = await response.json();
 
     if (response.status !== 201) {
       setError(prediction.detail ?? 'Unknown error occurred');
@@ -110,13 +112,16 @@ export default function Face2MemeClient() {
       prediction.status !== "failed"
     ) {
       await sleep(100);
+      console.log(prediction.status)
+      console.log(prediction.id)
       const response = await fetch("/api/predictions/" + prediction.id);
-      prediction = await response.json() as Prediction;
+      prediction = await response.json();
 
       if (response.status !== 200) {
         setError(prediction.detail ?? 'Unknown error occurred');
         return;
       }
+      console.log({prediction})
       setPrediction(prediction);
 
     }
@@ -133,15 +138,27 @@ export default function Face2MemeClient() {
 
   return (
     <section className="bg-black">
-      <div className="max-w-6xl px-4 py-8 mx-auto sm:py-24 sm:px-6 lg:px-8">
+      <div className="max-w-6xl px-4 py-8 mx-auto sm:py-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center"></div>
         <p className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-          Hello World... Hello life
+          Create your {' '}
+            <a
+              className="text-yellow-500"
+            >
+              Meme
+            </a>
         </p>
       
         <form onSubmit={handleSubmit} >
-        <div >
-        <div className="grid grid-cols-1 gap-4">
+          <div >
+          
+        <div className="md:container md:mx-auto px-4 w-full lg:w-1/2 flex flex-col gap-2 text-foreground mb-4">
+        
+        <div className="mt-8">
+            <p className="text-xl font-bold text-white sm:text-xl">
+              Your image
+            </p>
+          </div>
         {!selectedImage && (
           <div className="flex items-center justify-center w-full">
           <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
@@ -167,15 +184,22 @@ export default function Face2MemeClient() {
                   alt="Thumb"
                 />
                 </div>
+                {!prediction && (
                 <div >
                   <Button onClick={removeSelectedImage}>
                     Cancel
                   </Button>
-                </div>            
+                </div>     
+                )}       
               </div>
             )}
-          
 
+          <div>
+            <p className="text-xl font-bold text-white sm:text-xl">
+              Target image
+            </p>
+          </div>
+          
           {!selectedSecondImage && (
           <div className="flex items-center justify-center w-full">
           <label htmlFor="dropzone-file-2" className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
@@ -194,20 +218,19 @@ export default function Face2MemeClient() {
 
           {selectedSecondImage && (
               <div className="mt-4 mb-4 flex flex-col items-center justify-center gap-4 overflow-hidden">
-              <div className={styles.imageWrapper}>
-
-                <img className={'${styles.img}'}
-                  src={URL.createObjectURL(selectedSecondImage)}
-                  alt="Thumb"
-                />
+                <div className={styles.imageWrapper}>
+                  <img className={'${styles.img}'}
+                    src={URL.createObjectURL(selectedSecondImage)}
+                    alt="Thumb"
+                  />
                 </div>
                 <div >
-                {!selectedImage && (
+                {!selectedImage && !prediction && (
                   <Button onClick={removeSelectedSecondImage}>
                     Cancel
                   </Button>
                 )}
-                {selectedImage && (
+                {selectedImage && !prediction && (
                   <div className="grid grid-cols-2 gap-4">
                   <Button onClick={removeSelectedSecondImage}>
                     Cancel
@@ -229,6 +252,8 @@ export default function Face2MemeClient() {
       </form>
       </div>
 
+      <div ref={predictionRef}></div>
+
       {error && 
 
         <div className="md:container md:mx-auto px-4 w-full lg:w-1/3 flex flex-col gap-2 text-foreground mb-20">
@@ -240,28 +265,34 @@ export default function Face2MemeClient() {
         }
 
         {prediction && (
-        <div className="md:container md:mx-auto px-4 w-full lg:w-1/3 flex flex-col gap-2 text-foreground mb-40">
-          {prediction.status !== "succeeded" && (
-            <p>status: {prediction.status}</p>
-          )}
+        <div className="max-w-6xl px-4 mb-2 mx-auto sm:py-4 sm:px-6 lg:px-8">
           
-            {prediction.output && (
-              <div className="mt-4 mb-4 flex flex-col items-center justify-center gap-4 overflow-hidden">
-              <div >
-                  <Image
-                  fill
-                  src={prediction.output}
-                  alt="output"
-                  sizes='100vw'
-                />
-
-              </div>
-              <div className="grid grid-col gap-4">
-                <Button  onClick={handleDownload}> Download</Button>
-              </div> 
-              </div>
-            )}
-            
+            <div className="md:container md:mx-auto px-4 w-full lg:w-1/2 flex flex-col gap-2 text-foreground mb-4">
+              <div>
+                <p className="text-xl font-bold text-white sm:text-xl">
+                  Your new meme
+                </p>
+            </div>
+              {prediction.status !== "succeeded" && (
+                <div>
+                  <p>status: {prediction.status}</p>
+                </div>
+              )}
+              {prediction.output && (
+                
+                <div className="mt-4 mb-4 flex flex-col items-center justify-center gap-4 overflow-hidden">
+                  <div className={styles.imageWrapper}>
+                    <img className={'${styles.img}'}
+                      src={prediction.output}
+                      alt="out"
+                    />
+                  </div>
+                  <div className="grid grid-col ">
+                    <Button onClick={handleDownload}> Download</Button>
+                  </div> 
+                </div>
+              )}
+            </div>    
         </div>
         )}
 

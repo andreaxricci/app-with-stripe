@@ -35,6 +35,8 @@ const handler = async (req: NextRequest): Promise<Response> => {
     }
 
     const prediction = await res.json();
+    console.log("INDEX")
+    console.log(JSON.stringify(prediction))
 
     return new Response(JSON.stringify(prediction), {
         status: 201,
