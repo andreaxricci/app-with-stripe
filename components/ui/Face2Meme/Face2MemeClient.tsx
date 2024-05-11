@@ -21,6 +21,7 @@ export default function Face2MemeClient() {
   const [error, setError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | undefined>();
   const [selectedSecondImage, setSelectedSecondImage] = useState<File | undefined>();
+  const [text, setText] = useState('');
   const secondImageRef = useRef<HTMLDivElement | null>(null);
   const predictionRef = useRef<HTMLDivElement | null>(null);
 
@@ -176,22 +177,42 @@ export default function Face2MemeClient() {
           )}
 
           {selectedImage && (
-              <div className="mt-4 mb-4 flex flex-col items-center justify-center gap-4 overflow-hidden">
+            <div className="mt-4 mb-4 flex flex-col items-center justify-center gap-4 overflow-hidden">
+              <div className="mb-4 w-full">
+                <textarea
+                  className="flex min-h-[60px] w-full  rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  id="memetext"
+                  name="memetext"
+                  placeholder="Add meme text here"
+                  value={text} // Set the value of the textarea to the text state
+                  onChange={(e) => setText(e.target.value)} // Update the text state when the textarea value changes
+                />
+              </div>
+              
               <div className={styles.imageWrapper}>
 
                 <img className={'${styles.img}'}
                   src={URL.createObjectURL(selectedImage)}
                   alt="Thumb"
                 />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  { text && (
+                      <div className="absolute bottom-0 left-0 right-0 p-2 bg-black bg-opacity-50 text-white text-xl">
+                        {text}
+                      </div>
+                  )}
+
                 </div>
-                {!prediction && (
-                <div >
-                  <Button onClick={removeSelectedImage}>
-                    Cancel
-                  </Button>
-                </div>     
-                )}       
               </div>
+                
+              {!prediction && (
+              <div >
+                <Button onClick={removeSelectedImage}>
+                  Cancel
+                </Button>
+              </div>     
+              )}       
+            </div>
             )}
 
           <div>
@@ -276,6 +297,11 @@ export default function Face2MemeClient() {
               {prediction.status !== "succeeded" && (
                 <div>
                   <p>status: {prediction.status}</p>
+                </div>
+              )}
+              {prediction.status === "succeeded" && prediction.output === null && (
+                <div>
+                  <p>Error: try using another image </p>
                 </div>
               )}
               {prediction.output && (
