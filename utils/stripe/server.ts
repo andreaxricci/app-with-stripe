@@ -37,6 +37,21 @@ export async function checkoutWithStripe(
       throw new Error('Could not get user session.');
     }
 
+    const price2credits: Record<number, number> = {
+      2000: 20,
+      1250: 10,
+      450: 3
+    }
+    let credits: number | undefined;
+    if (price.unit_amount) {
+      credits = price2credits[price.unit_amount]; 
+    }
+
+    if (!credits) {
+      console.error(error);
+      throw new Error('Could not get user session.');
+    }
+
     // Retrieve or create the customer in Stripe
     let customer: string;
     try {
@@ -49,7 +64,7 @@ export async function checkoutWithStripe(
       throw new Error('Unable to access customer record.');
     }
 
-    console.log("breakpoint B")
+    console.log(`breakpoint B ${user.id}`)
 
     let params: Stripe.Checkout.SessionCreateParams = {
       allow_promotion_codes: true,
@@ -83,7 +98,11 @@ export async function checkoutWithStripe(
     } else if (price.type === 'one_time') {
       params = {
         ...params,
-        mode: 'payment'
+        mode: 'payment',
+        metadata: {
+          userId: user.id,
+          credits: credits
+        }
       };
     }
 

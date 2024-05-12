@@ -7,8 +7,10 @@ import {
   upsertPriceRecord,
   manageSubscriptionStatusChange,
   deleteProductRecord,
-  deletePriceRecord
+  deletePriceRecord,
+  upsertUserCreditsToSupabase
 } from '@/utils/supabase/admin';
+import { Metadata } from 'next';
 
 const relevantEvents = new Set([
   'product.created',
@@ -24,12 +26,12 @@ const relevantEvents = new Set([
 ]);
 
 export async function POST(req: Request) {
-  console.log("breakpoint A1")
+  console.log(`Stripe breakpoint`)
   const body = await req.text();
   const sig = req.headers.get('stripe-signature') as string;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   let event: Stripe.Event;
-  console.log("breakpoint A2")
+  
 
   try {
     if (!sig || !webhookSecret)
@@ -42,7 +44,7 @@ export async function POST(req: Request) {
   }
 
   if (relevantEvents.has(event.type)) {
-    console.log("event type", event.type)
+    console.log(event.type)
     try {
       switch (event.type) {
         case 'product.created':
@@ -70,8 +72,23 @@ export async function POST(req: Request) {
           );
           break;
         case 'checkout.session.completed':
-          const checkoutSession = event.data.object as Stripe.Checkout.Session;
-          console.log("Stripe: ", checkoutSession.mode )
+          const checkoutSession = event.data.object as Stripe.Checkout.Session & { 
+            metadata: Metadata;
+          };
+
+          const userId = checkoutSession.metadata.userId;
+          const credits = checkoutSession.metadata.credits;
+
+          console.log(`Checkout Session Mode: ${checkoutSession.mode}` )
+
+          if (checkoutSession.mode === 'payment') {
+            
+            await upsertUserCreditsToSupabase(
+              userId as string,
+              parseInt(credits) as number
+            );
+          }
+
           if (checkoutSession.mode === 'subscription') {
             const subscriptionId = checkoutSession.subscription;
             await manageSubscriptionStatusChange(

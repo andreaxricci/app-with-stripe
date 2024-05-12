@@ -22,16 +22,24 @@ export default function Navlinks({ user, credits }: NavlinksProps) {
         <Link href="/" className={s.logo} aria-label="Logo">
           <Logo />
         </Link>
+        {/* 
         <nav className="ml-6 space-x-2 lg:block">
+          <div>
           <Link href="/pricing" className={s.link}>
-            Buy credits
+            Pricing
           </Link>
           {user && (
+            <div>
             <Link href="/account" className={s.link}>
               Account
             </Link>
+            <Link href="/face2meme" className={s.link}>
+              Create
+            </Link>
+          </div>
           )}
-        </nav>
+          </div>
+        </nav> */}
       </div>
       {/*  {user ? ( <div> Credits available: {credits} </div> ) : <div></div>}  */}
       <div className="flex justify-end space-x-8">
