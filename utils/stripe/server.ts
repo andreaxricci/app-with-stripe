@@ -49,6 +49,8 @@ export async function checkoutWithStripe(
       throw new Error('Unable to access customer record.');
     }
 
+    console.log("breakpoint B")
+
     let params: Stripe.Checkout.SessionCreateParams = {
       allow_promotion_codes: true,
       billing_address_collection: 'required',
@@ -96,6 +98,8 @@ export async function checkoutWithStripe(
 
     // Instead of returning a Response, just return the data or error.
     if (session) {
+      console.log("breakpoint C")
+      console.log(session)
       return { sessionId: session.id };
     } else {
       throw new Error('Unable to create checkout session.');
