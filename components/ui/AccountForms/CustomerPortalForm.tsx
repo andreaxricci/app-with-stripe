@@ -26,7 +26,7 @@ interface Props {
 
 export default function CustomerPortalForm({ subscription }: Props) {
   const router = useRouter();
-  const currentPath = usePathname();
+  const currentPath = usePathname() || '';
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const subscriptionPrice =
@@ -36,13 +36,15 @@ export default function CustomerPortalForm({ subscription }: Props) {
       currency: subscription?.prices?.currency!,
       minimumFractionDigits: 0
     }).format((subscription?.prices?.unit_amount || 0) / 100);
-
-  const handleStripePortalRequest = async () => {
+  
+    
+    const handleStripePortalRequest = async () => {
     setIsSubmitting(true);
-    const redirectUrl = await createStripePortal(currentPath);
+    const redirectUrl = await createStripePortal(currentPath) 
     setIsSubmitting(false);
     return router.push(redirectUrl);
-  };
+    
+  }; 
 
   return (
     <Card
