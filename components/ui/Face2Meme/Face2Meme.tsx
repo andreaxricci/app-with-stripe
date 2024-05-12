@@ -2,22 +2,22 @@ import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation";
 import Face2MemeClient from "./Face2MemeClient"
 
-export async function getServerData() {
+export default async function Face2Meme() {
   const supabase = createClient();
 
   const {
-    data: { user },
+    data: { user }
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login");
-    return { error: "User not authenticated" };
+    return redirect('/signin');
   }
 
-  return { user };
-}
+  const { data: userDetails } = await supabase
+    .from('users')
+    .select('*')
+    .single();
 
-export default function Face2Meme() {
-  return <Face2MemeClient />;
+  return <Face2MemeClient user={user} credits={userDetails?.credits ?? 0} />;
 }
 

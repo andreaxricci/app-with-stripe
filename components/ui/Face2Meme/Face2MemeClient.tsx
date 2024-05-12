@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { saveAs } from 'file-saver'; 
+import Link from 'next/link';
 import styles from "./Face2Meme.module.css"
 import Button from "@/components/ui/Button"
 
@@ -14,7 +15,12 @@ interface Prediction {
   detail?: any;
 }
 
-export default function Face2MemeClient() {
+interface Face2MemeClientProps {
+  user?: any;
+  credits?: number;
+}
+
+export default function Face2MemeClient({ user, credits }: Face2MemeClientProps) {
   
   const [mounted, setMounted] = useState<boolean>(false)
   const [prediction, setPrediction] = useState<Prediction | null>(null);
@@ -149,13 +155,24 @@ export default function Face2MemeClient() {
               Meme
             </a>
         </p>
+        {credits && credits === 5 && prediction === null && (
+          <div className="sm:flex sm:flex-col sm:align-center">
+          <Link href="/pricing">
+            <Button>Buy credits</Button>
+          </Link>
+          </div>
+        )}
       
         <form onSubmit={handleSubmit} >
           <div >
           
         <div className="md:container md:mx-auto px-4 w-full lg:w-1/2 flex flex-col gap-2 text-foreground mb-4">
-        
-        <div className="mt-8">
+          <div className="mt-8">
+            <p className="text-sm text-white sm:text-lg">
+            You have { credits } credits
+            </p>
+          </div>
+        <div className="mt-4">
             <p className="text-xl font-bold text-white sm:text-xl">
               Your image
             </p>
@@ -178,7 +195,7 @@ export default function Face2MemeClient() {
 
           {selectedImage && (
             <div className="mt-4 mb-4 flex flex-col items-center justify-center gap-4 overflow-hidden">
-              <div className="mb-4 w-full">
+              {/* <div className="mb-4 w-full">
                 <textarea
                   className="flex min-h-[60px] w-full  rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                   id="memetext"
@@ -187,7 +204,7 @@ export default function Face2MemeClient() {
                   value={text} // Set the value of the textarea to the text state
                   onChange={(e) => setText(e.target.value)} // Update the text state when the textarea value changes
                 />
-              </div>
+              </div> */}
               
               <div className={styles.imageWrapper}>
 
@@ -200,8 +217,7 @@ export default function Face2MemeClient() {
                       <div className="absolute bottom-0 left-0 right-0 p-2 bg-black bg-opacity-50 text-white text-xl">
                         {text}
                       </div>
-                  )}
-
+                  )}    
                 </div>
               </div>
                 
@@ -256,6 +272,10 @@ export default function Face2MemeClient() {
                   <Button onClick={removeSelectedSecondImage}>
                     Cancel
                   </Button>
+                  {credits && credits > 5 && prediction === null && (
+                    <Button type="submit">Submit</Button>
+                  )}
+                  
                   {prediction === null && ( 
                   <Button type="submit">Submit</Button>
                   )} 
