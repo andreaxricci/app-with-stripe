@@ -83,7 +83,7 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
       let dataUrl2;
       reader2.onload = () => {
           dataUrl2 = reader2.result as string;
-          sendRequest(dataUrl1, dataUrl2);
+          sendRequest(dataUrl1, dataUrl2, user);
         };
         reader2.readAsDataURL(selectedSecondImage as Blob);
       
@@ -92,7 +92,7 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
     reader1.readAsDataURL(selectedImage as Blob);
   };
 
-  const sendRequest = async (dataUrl1: string, dataUrl2: string) => {
+  const sendRequest = async (dataUrl1: string, dataUrl2: string, user: any) => {
     console.log("Triggered!")
     const response = await fetch("/api/predictions", {
     method: "POST",
@@ -101,7 +101,8 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
       },
     body: JSON.stringify({
       input_image: dataUrl1,
-      target_image: dataUrl2
+      target_image: dataUrl2,
+      user: user
       }),
     });
 
@@ -132,6 +133,36 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
       setPrediction(prediction);
 
     }
+
+    // If the prediction is successful, invoke the reduceUserCredits endpoint
+    if (prediction.status === "succeeded") {
+      try {
+        const creditsResponse = await fetch("/api/predictions/reduceUserCredits", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": user.id
+          },
+          body: JSON.stringify({
+            user: user,
+          }),
+        });
+
+        console.log('breakpoint api 1')
+
+        if (!creditsResponse.ok) {
+          throw new Error('Failed to reduce user credits');
+        }
+
+        const creditsData = await creditsResponse.json();
+        console.log('User credits reduced successfully:', creditsData);
+      } catch (error) {
+        console.error('Error reducing user credits:', error);
+        // Handle error as needed
+        console.log('breakpoint api 2')
+      }
+    }
+
   };
 
   // useEffect only runs on the client, so now we can safely show the UI

@@ -319,6 +319,46 @@ const upsertUserCreditsToSupabase = async (uuid: string, creditsToAdd: number) =
   }
 };
 
+const reduceUserCredits = async (uuid: string) => {
+  try {
+    // Fetch the current credits for the user
+    const { data: userData, error: fetchError } = await supabaseAdmin
+      .from('users')
+      .select('credits')
+      .eq('id', uuid)
+      .single();
+
+    if (fetchError) {
+      throw new Error(`Failed to fetch user data: ${fetchError.message}`);
+    }
+
+    if (!userData) {
+      throw new Error(`User not found with UUID: ${uuid}`);
+    }
+
+    // Extract the current credits and calculate the new credits
+    const currentCredits = userData.credits as number;
+
+    if (currentCredits < 1) {
+      throw new Error(`Insufficient credits`);
+    }
+    const newCredits = currentCredits -1;
+
+    // Update the user's credits
+    const { error: updateError } = await supabaseAdmin
+      .from('users')
+      .update({ credits: newCredits })
+      .eq('id', uuid);
+
+    if (updateError) {
+      throw new Error(`Failed to update user credits: ${updateError.message}`);
+    }
+
+    return newCredits;
+  } catch (error) {
+    throw new Error(`Failed to update user credits`);
+  }
+};
 
 
 export {
@@ -328,5 +368,6 @@ export {
   deletePriceRecord,
   createOrRetrieveCustomer,
   manageSubscriptionStatusChange,
-  upsertUserCreditsToSupabase
+  upsertUserCreditsToSupabase,
+  reduceUserCredits
 };

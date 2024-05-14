@@ -8,7 +8,7 @@ const handler = async (req: NextRequest): Promise<Response> => {
       return new Response('Method Not Allowed', { status: 405 });
     }
 
-    const { input_image, target_image } = await req.json();
+    const { input_image, target_image, user } = await req.json();
 
     const res = await fetch("https://api.replicate.com/v1/predictions", {
     headers: {
@@ -35,8 +35,10 @@ const handler = async (req: NextRequest): Promise<Response> => {
     }
 
     const prediction = await res.json();
-    console.log("INDEX")
-    console.log(JSON.stringify(prediction))
+    // console.log("INDEX")
+    // console.log(JSON.stringify(prediction))
+
+    {/* await reduceUserCredits(user) */}
 
     return new Response(JSON.stringify(prediction), {
         status: 201,
