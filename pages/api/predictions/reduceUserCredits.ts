@@ -1,5 +1,7 @@
 import { reduceUserCredits } from '@/utils/supabase/admin'; // Import the function to reduce user credits
 
+export const runtime = 'edge';
+
 export default async function handler(req: { method: string; headers: { [x: string]: any; }; }, res: { status: (arg0: number) => { (): any; new(): any; json: { (arg0: { error?: string; credits?: number; }): void; new(): any; }; }; }) {
   if (req.method === 'POST') {
     try {
