@@ -148,8 +148,6 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
           }),
         });
 
-        console.log('breakpoint api 1')
-
         if (!creditsResponse.ok) {
           throw new Error('Failed to reduce user credits');
         }
@@ -159,7 +157,6 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
       } catch (error) {
         console.error('Error reducing user credits:', error);
         // Handle error as needed
-        console.log('breakpoint api 2')
       }
     }
 
@@ -186,7 +183,7 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
               Meme
             </a>
         </p>
-        {credits && credits === 5 && prediction === null && (
+        {credits && credits === 0 && prediction === null && (
           <div className="sm:flex sm:flex-col sm:align-center">
           <Link href="/pricing">
             <Button>Buy credits</Button>
@@ -303,13 +300,14 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
                   <Button onClick={removeSelectedSecondImage}>
                     Cancel
                   </Button>
-                  {credits && credits > 5 && prediction === null && (
+                  {credits && credits > 0 && prediction === null && (
                     <Button type="submit">Submit</Button>
                   )}
-                  
-                  {prediction === null && ( 
-                  <Button type="submit">Submit</Button>
-                  )} 
+                  {credits && credits === 0 && prediction === null && (
+                    <Link href="/pricing">
+                      <Button>Buy credits</Button>
+                    </Link>
+                  )}
                   {prediction !== null && ( 
                   <Button type="submit" disabled>Submit</Button>
                   )}
