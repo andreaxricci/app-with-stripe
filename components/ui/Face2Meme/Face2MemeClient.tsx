@@ -71,6 +71,13 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
     }
   };
 
+  const removebothImages = () => {
+    setSelectedImage(undefined);
+    setSelectedSecondImage(undefined);
+    setPrediction(null)
+    setError(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -153,10 +160,16 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
         }
 
         const creditsData = await creditsResponse.json();
+
+        // Check if the server returns an error
+        if (creditsData.error) {
+          throw new Error(creditsData.error);
+        }
+
         console.log('User credits reduced successfully:', creditsData);
       } catch (error) {
         console.error('Error reducing user credits:', error);
-        // Handle error as needed
+
       }
     }
 
@@ -195,12 +208,12 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
           <div >
           
         <div className="md:container md:mx-auto px-4 w-full lg:w-1/2 flex flex-col gap-2 text-foreground mb-4">
-          <div className="mt-8">
+         {/* <div className="mt-8">
             <p className="text-sm text-white sm:text-lg">
             You have { credits } credits
             </p>
-          </div>
-        <div className="mt-4">
+          </div> */}
+        <div className="mt-8">
             <p className="text-xl font-bold text-white sm:text-xl">
               Your image
             </p>
@@ -362,9 +375,13 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
                       alt="out"
                     />
                   </div>
-                  <div className="grid grid-col ">
+                  <div className="grid grid-cols-2 gap-4">
                     <Button onClick={handleDownload}> Download</Button>
-                  </div> 
+                  
+                  <Link href="/face2meme">
+                      <Button onClick={removebothImages}>Start again</Button>
+                    </Link>
+                    </div> 
                 </div>
               )}
             </div>    

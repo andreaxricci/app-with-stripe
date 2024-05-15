@@ -9,8 +9,8 @@ import { getURL } from '@/utils/helpers';
 import 'styles/main.css';
 
 const meta = {
-  title: 'Next.js Subscription Starter',
-  description: 'Brought to you by Vercel, Stripe, and Supabase.',
+  title: 'Personalise your memes with GenAI',
+  description: 'Use GenAI to personalise your memes.',
   cardImage: '/og.png',
   robots: 'follow, index',
   favicon: '/favicon.ico',
@@ -22,10 +22,10 @@ export async function generateMetadata(): Promise<Metadata> {
     title: meta.title,
     description: meta.description,
     referrer: 'origin-when-cross-origin',
-    keywords: ['Vercel', 'Supabase', 'Next.js', 'Stripe', 'Subscription'],
-    authors: [{ name: 'Vercel', url: 'https://vercel.com/' }],
-    creator: 'Vercel',
-    publisher: 'Vercel',
+    keywords: ['Meme', 'GenAI', 'AI', 'Memes'],
+    authors: [{ name: 'AR', url: 'https://makethatmeme.com/' }],
+    creator: 'AR',
+    publisher: 'AR',
     robots: meta.robots,
     icons: { icon: meta.favicon },
     metadataBase: new URL(meta.url),
@@ -39,8 +39,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      site: '@Vercel',
-      creator: '@Vercel',
+      site: '',
+      creator: '',
       title: meta.title,
       description: meta.description,
       images: [meta.cardImage]
@@ -55,7 +55,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
         <Navbar />
         <main
           id="skip"
-          className="min-h-[calc(100dvh-4rem)] md:min-h[calc(100dvh-5rem)]"
+          className="min-h-[calc(100dvh-4rem)] md:min-h[calc(100dvh-5rem)] md:ml-20 md:mr-20"
         >
           {children}
         </main>

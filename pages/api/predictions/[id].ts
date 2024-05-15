@@ -3,10 +3,9 @@ import type { NextRequest } from 'next/server';
 export const runtime = 'edge';
 
 const handler = async (req: NextRequest): Promise<Response> => {
-  console.log("breakpoint 1")
   const url = new URL(req.url);
   const id = url.searchParams.get('id');
-  console.log(id)
+  //console.log(id)
 
   const res = await fetch(
     "https://api.replicate.com/v1/predictions/" + id,
@@ -17,7 +16,7 @@ const handler = async (req: NextRequest): Promise<Response> => {
       }, 
     }
   );
-  console.log(res.status)
+  //console.log(res.status)
 
   if (res.status !== 200) {
       const error = await res.json();

@@ -18,7 +18,7 @@ export default function Navlinks({ user, credits }: NavlinksProps) {
 
   return (
     <div className="relative flex flex-row justify-between py-4 align-center md:py-6">
-      <div className="flex items-center flex-1">
+      <div className="flex items-center flex-1 ml-4">
         <Link href="/" className={s.logo} aria-label="Logo">
           <Logo />
         </Link>
@@ -42,16 +42,19 @@ export default function Navlinks({ user, credits }: NavlinksProps) {
         </nav> */}
       </div>
       {/*  {user ? ( <div> Credits available: {credits} </div> ) : <div></div>}  */}
-      <div className="flex justify-end space-x-8">
+      <div className="flex justify-end space-x-8 mr-4">
         {user ? (
-          
+          <div className="flex justify-end space-x-8 mr-4">
+          <Link href="/account" className={s.link}>
+            Account
+          </Link>
           <form onSubmit={(e) => handleRequest(e, SignOut, router)}>
             <input type="hidden" name="pathName" value={usePathname() || ''} />
             <button type="submit" className={s.link}>
               Sign out
             </button>
           </form>
-          
+          </div>
         ) : (
           <Link href="/signin" className={s.link}>
             Sign In
