@@ -6,6 +6,7 @@ import type { Database, Tables, TablesInsert } from 'types_db';
 
 type Product = Tables<'products'>;
 type Price = Tables<'prices'>;
+type Credit = Tables<'credits'>;
 
 // Change to control trial period length
 const TRIAL_PERIOD_DAYS = 0;
@@ -319,6 +320,29 @@ const upsertUserCreditsToSupabase = async (uuid: string, creditsToAdd: number) =
   }
 };
 
+
+const upsertUserCreditsToSupabasenew = async (payment_intent: string, uuid: string, creditsToAdd: number) => {
+  const creditData: Credit = {
+    credit_id: payment_intent,
+    user_id: uuid,
+    credits_purchased: creditsToAdd,
+    purchase_date:  new Date().toISOString(),
+    credits_used: 0
+  };
+
+  const { error: upsertError } = await supabaseAdmin
+    .from('credits')
+    .upsert([creditData]);
+
+  if (upsertError) {
+    console.error(`Error upserting credit data: ${upsertError.message}`);
+  } else {
+    console.log('Credit data upserted successfully');
+  }
+};
+
+
+
 const reduceUserCredits = async (uuid: string) => {
   try {
     // Fetch the current credits for the user
@@ -369,5 +393,6 @@ export {
   createOrRetrieveCustomer,
   manageSubscriptionStatusChange,
   upsertUserCreditsToSupabase,
-  reduceUserCredits
+  reduceUserCredits,
+  upsertUserCreditsToSupabasenew
 };

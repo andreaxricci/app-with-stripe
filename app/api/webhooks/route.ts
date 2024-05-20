@@ -8,7 +8,8 @@ import {
   manageSubscriptionStatusChange,
   deleteProductRecord,
   deletePriceRecord,
-  upsertUserCreditsToSupabase
+  upsertUserCreditsToSupabase,
+  upsertUserCreditsToSupabasenew
 } from '@/utils/supabase/admin';
 import { Metadata } from 'next';
 
@@ -78,12 +79,18 @@ export async function POST(req: Request) {
 
           const userId = checkoutSession.metadata.userId;
           const credits = checkoutSession.metadata.credits;
+          const payment_intent = checkoutSession.payment_intent
 
           console.log(`Checkout Session Mode: ${checkoutSession.mode}` )
 
           if (checkoutSession.mode === 'payment') {
             
             await upsertUserCreditsToSupabase(
+              userId as string,
+              parseInt(credits) as number
+            );
+            await upsertUserCreditsToSupabasenew(
+              payment_intent as string,
               userId as string,
               parseInt(credits) as number
             );
