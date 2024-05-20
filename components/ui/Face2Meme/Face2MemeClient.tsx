@@ -79,11 +79,14 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
   };
 
   const generateCombinedImage = () => {
-    if (selectedSecondImage && text) {
+    if (prediction?.output) {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         const image = new Image();
-        image.src = URL.createObjectURL(selectedSecondImage);
+
+        // Set crossOrigin to anonymous to handle cross-origin images
+        image.crossOrigin = "anonymous";
+        image.src = prediction.output;
 
         image.onload = () => {
             canvas.width = image.width;
@@ -156,10 +159,18 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
                 context.fillStyle = 'white';
                 context.fillText("Made with AI (www.makethatmeme.com)", x, footnoteY);
 
-                const dataUrl = canvas.toDataURL('image/jpeg', 1.0);
-                setCombinedImageUrl(dataUrl);
+                try {
+                    const dataUrl = canvas.toDataURL('image/jpeg', 1.0);
+                    setCombinedImageUrl(dataUrl);
+                } catch (err) {
+                    console.error("Error generating combined image:", err);
+                }
             }
         };
+
+        image.onerror = (err) => {
+          console.error("Error loading image:", err);
+      };
     }
 };
 
@@ -276,7 +287,7 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
 
     useEffect(() => {
       generateCombinedImage();
-    }, [selectedSecondImage, text]);
+    }, [prediction, text]);
     
   if (!mounted) {
     return null
@@ -411,6 +422,7 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
               )}
               </div>
 
+              {/* {prediction && (        
                 <div className="mb-4 w-full">
                   <textarea
                     className="flex min-h-[60px] w-full  rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
@@ -421,19 +433,17 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
                     onChange={(e) => setText(e.target.value)} // Update the text state when the textarea value changes
                   />
                 </div>
-
+              )}
                 {combinedImageUrl && (
                       
                   <div className={styles.imageWrapper}>
                   <img className={'${styles.img}'} src={combinedImageUrl} alt="Combined preview" />
                   </div>
                         
-                )}  
-                <div>
-                  <Button onClick={handleCombinedDownload}>Download w/ text</Button>
-                </div>     
+                )}  */}
+   
               </div>
-            )}
+            )} 
             </div>
         </div>
         <div ref={secondImageRef}></div>
@@ -475,29 +485,45 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
               {prediction.output && (
                 
                 <div className="mt-4 mb-4 flex flex-col items-center justify-center gap-4 overflow-hidden">
+                  
+                  {/* 
                   <div className={styles.imageWrapper}>
                     <img className={'${styles.img}'}
                       src={prediction.output}
                       alt="out"
                     />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  </div> */}
+                  <div className="mb-4 w-full">
+                  <textarea
+                    className="flex min-h-[60px] w-full  rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    id="memetext"
+                    name="memetext"
+                    placeholder="Add meme text here"
+                    value={text} // Set the value of the textarea to the text state
+                    onChange={(e) => setText(e.target.value)} // Update the text state when the textarea value changes
+                  />
+                </div>
+                  {/* <div className="grid grid-cols-2 gap-4">
                     <Button onClick={handleDownload}> Download</Button>
-                  
-                  <Link href="/face2meme">
+                    <Link href="/face2meme">
                       <Button onClick={removebothImages}>Start again</Button>
                     </Link>
-                    </div>
+                  </div> */}
                     {combinedImageUrl && (
                       
                       <div className={styles.imageWrapper}>
                       <img className={'${styles.img}'} src={combinedImageUrl} alt="Combined preview" />
                       </div>
                             
-                    )}  
-                    <div>
-                      <Button onClick={handleCombinedDownload}>Download w/ text</Button>
-                    </div> 
+                    )} 
+                    {prediction && combinedImageUrl && (
+                    <div className="grid grid-cols-2 gap-4">
+                    <Button onClick={handleCombinedDownload}>Download</Button>
+                    <Link href="/face2meme">
+                      <Button onClick={removebothImages}>Start again</Button>
+                    </Link>
+                  </div>
+                    )}
                 </div>
               )}
             </div>    
