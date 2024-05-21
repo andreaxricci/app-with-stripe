@@ -384,6 +384,63 @@ const reduceUserCredits = async (uuid: string) => {
   }
 };
 
+interface IncrementOldestValidCreditParams {
+  user_uuid: string;
+}
+
+interface IncrementOldestValidCreditResponse {
+  message: string;
+}
+
+const reduceUserCreditsNew = async (uuid: string): Promise<void> => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .rpc('increment_oldest_valid_credit', {
+        user_uuid: uuid,
+      });
+
+    if (error) {
+      throw new Error(`Failed to update user credits: ${error.message}`);
+    }
+
+    if (data) {
+      console.log(data.message);
+    } else {
+      console.log(`No response received for user ${uuid}`);
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error(`Failed to update user credits`);
+  }
+};
+
+
+interface GetAvailableCreditsResponse {
+  remaining_credits: number;
+}
+
+const getAvailableCredits = async (uuid: string): Promise<number> => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .rpc('get_available_credits', {
+        user_uuid: uuid,
+      });
+
+    if (error) {
+      throw new Error(`Failed to get available credits: ${error.message}`);
+    }
+
+    if (data) {
+      return data.remaining_credits;
+    } else {
+      throw new Error('No response received');
+    }
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to get available credits');
+  }
+};
+
 
 export {
   upsertProductRecord,
@@ -394,5 +451,7 @@ export {
   manageSubscriptionStatusChange,
   upsertUserCreditsToSupabase,
   reduceUserCredits,
-  upsertUserCreditsToSupabasenew
+  upsertUserCreditsToSupabasenew,
+  reduceUserCreditsNew,
+  getAvailableCredits
 };

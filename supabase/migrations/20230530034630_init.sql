@@ -143,3 +143,67 @@ create policy "Can only view own subs data." on subscriptions for select using (
  */
 drop publication if exists supabase_realtime;
 create publication supabase_realtime for table products, prices;
+
+
+/**
+ * FUNCTION TO KEEP TRACK OF CREDITS USAGE
+ */
+create or replace function increment_oldest_valid_credit(user_uuid uuid)
+returns json as $$
+declare
+  credit_id_tmp text;
+begin
+  -- Select the oldest valid credit record
+  select c.credit_id into credit_id_tmp
+  from credits c
+  where c.user_id = user_uuid
+    and c.purchase_date >= now() - interval '365 days'
+    and c.credits_used < c.credits_purchased
+  order by c.purchase_date asc
+  limit 1;
+
+  -- Update the credits_used if a valid record is found
+  if found then
+    update credits c
+    set credits_used = c.credits_used + 1
+    where c.credit_id = credit_id_tmp;
+    return json_build_object('message', 'Credit updated successfully');
+  else
+    return json_build_object('message', 'No valid credits found for update');
+  end if;
+end;
+$$ language plpgsql;
+
+
+/**
+ * FUNCTION TO KEEP TRACK OF AVAILABLE CREDITS
+ */
+create or replace function get_available_credits(user_uuid uuid)
+returns json as $$
+declare
+  total_purchased int;
+  total_used int;
+  remaining_credits int;
+begin
+  -- Initialize totals to zero
+  total_purchased := 0;
+  total_used := 0;
+
+  -- Select and sum the credits_purchased and credits_used for the given user within the past 365 days
+  select 
+    coalesce(sum(c.credits_purchased), 0), 
+    coalesce(sum(c.credits_used), 0)
+  into 
+    total_purchased, 
+    total_used
+  from credits c
+  where c.user_id = user_uuid
+    and c.purchase_date >= now() - interval '365 days';
+
+  -- Calculate remaining credits
+  remaining_credits := total_purchased - total_used;
+
+  -- Return the remaining credits as a JSON object
+  return json_build_object('remaining_credits', remaining_credits);
+end;
+$$ language plpgsql;

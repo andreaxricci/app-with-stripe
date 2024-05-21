@@ -6,6 +6,7 @@ import NameForm from '@/components/ui/AccountForms/NameForm';
 import CreditsForm from '@/components/ui/AccountForms/CreditsForm';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
+import { getAvailableCredits } from '@/utils/supabase/admin';
 
 export default async function Account() {
   const supabase = createClient();
@@ -14,6 +15,7 @@ export default async function Account() {
     data: { user }
   } = await supabase.auth.getUser();
 
+  {/* 
   const { data: userDetails } = await supabase
     .from('users')
     .select('*')
@@ -23,14 +25,22 @@ export default async function Account() {
     .from('subscriptions')
     .select('*, prices(*, products(*))')
     .in('status', ['trialing', 'active'])
-    .maybeSingle();
+    .maybeSingle(); 
 
   if (error) {
     console.log(error);
-  }
+  }  */}
 
   if (!user) {
     return redirect('/signin');
+  }
+
+  let availableCredits = 0;
+
+  try {
+    availableCredits = await getAvailableCredits(user.id);
+  } catch (error) {
+    console.error('Error fetching available credits:', error);
   }
 
   return (
@@ -41,7 +51,7 @@ export default async function Account() {
             Account
           </h1>
           <p className="max-w-2xl m-auto mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl">
-            Available credits: {userDetails?.credits ?? 0}
+            Available credits: {availableCredits}
           </p>
         </div>
       </div>

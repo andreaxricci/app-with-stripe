@@ -1,5 +1,5 @@
 import type { NextRequest, NextResponse } from 'next/server';
-import { reduceUserCredits } from '@/utils/supabase/admin';
+import { reduceUserCredits, reduceUserCreditsNew } from '@/utils/supabase/admin';
 
 export const runtime = 'edge';
 
@@ -13,7 +13,9 @@ const handler = async (req: NextRequest) => {
       }
 
       // Call the function to reduce user credits
-      await reduceUserCredits(userId);
+      // await reduceUserCredits(userId);
+
+      await reduceUserCreditsNew(userId);
 
       // Return a success response
       return new Response(JSON.stringify({ success: true }), { status: 200 });
