@@ -25,6 +25,7 @@ const handler = async (req: NextRequest): Promise<Response> => {
   }
 
   const prediction = await res.json();
+
   return new Response(JSON.stringify(prediction));
 };
 

@@ -232,8 +232,8 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
       prediction.status !== "failed"
     ) {
       await sleep(100);
-      console.log(prediction.status)
-      console.log(prediction.id)
+      // console.log(prediction.status)
+      // console.log(prediction.id)
       const response = await fetch("/api/predictions/" + prediction.id);
       prediction = await response.json();
 
@@ -241,9 +241,20 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
         setError(prediction.detail ?? 'Unknown error occurred');
         return;
       }
-      console.log({prediction})
+      // console.log({prediction})
       setPrediction(prediction);
 
+    }
+
+    if (prediction.status === "succeeded" && prediction.output === undefined) {
+      //setError(prediction.logs ?? 'Error: please try using a different image');
+      const errorMessage = prediction.logs 
+        ? `Error: please try a different image. Details: ${prediction.logs}`
+        : 'Error: please try using a different image';
+        
+      setError(errorMessage);
+      setPrediction(null)
+        return;
     }
 
     // If the prediction is successful, invoke the reduceUserCredits endpoint
