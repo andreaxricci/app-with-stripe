@@ -501,7 +501,7 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
             <div className="mt-4 mb-4 flex flex-col items-center justify-center gap-4 overflow-hidden">
               <div className={styles.imageWrapper}>
                 <img className={'${styles.img}'}
-                  src={selectedSecondImage}
+                  src={typeof selectedSecondImage === 'string' ? selectedSecondImage : URL.createObjectURL(selectedSecondImage)}
                   alt="Thumb"
                 />
                 {/*<img className={'${styles.img}'}
