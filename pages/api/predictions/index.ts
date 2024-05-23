@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 export const runtime = 'edge';
 
 const handler = async (req: NextRequest): Promise<Response> => {
-    console.log("breakpoint 0")
+    
     if (req.method !== 'POST') {
       return new Response('Method Not Allowed', { status: 405 });
     }

@@ -4,6 +4,8 @@ import { LandingPrimaryImageCtaSection } from '@/components/ui/Landing/Landing'
 import { createClient } from '@/utils/supabase/server';
 import Button from '@/components/ui/Button/Button';
 import Link from 'next/link';
+import { getAvailableCredits } from '@/utils/supabase/admin';
+import { redirect } from 'next/navigation';
 
 export default async function Home() {
   
@@ -13,18 +15,36 @@ export default async function Home() {
     data: { user }
   } = await supabase.auth.getUser(); 
 
+  if (!user) {
+    return redirect('/signin');
+  }
+
+  {/* 
+
   const { data: userDetails, error } = await supabase
     .from('users')
     .select('*')
-    .single();
+    .single(); 
 
   if (error) {
     console.log(error);
   }
 
+  */}
+
+  let availableCredits = 0;
+
+  try {
+    availableCredits = await getAvailableCredits(user.id);
+  } catch (error) {
+    console.error('Error fetching available credits:', error);
+  }
+
+  {/* 
+
   const credits = userDetails?.credits ?? 0 
 
-  {/* const { data: products } = await supabase
+  const { data: products } = await supabase
     .from('products')
     .select('*, prices(*)')
     .eq('active', true)
@@ -35,7 +55,8 @@ export default async function Home() {
 
     {/* return (
         <Homepage/>
-    ); */}
+    ); 
+  */}
 
   return (
       
@@ -47,14 +68,14 @@ export default async function Home() {
       imageShadow = 'soft'
       withBackground
     >
-    { credits < 1 &&
+    { availableCredits < 1 &&
       <div>
       <Link href="/pricing">
         <Button>Create your meme</Button>
       </Link>
       </div>
     }
-    { credits > 0 &&
+    { availableCredits > 0 &&
       <div className='flex justify-center items-center'>
       <Link href="/face2meme">
         <Button>Create your meme</Button>

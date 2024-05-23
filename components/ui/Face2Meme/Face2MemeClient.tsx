@@ -1,12 +1,20 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, SetStateAction } from "react";
 import { saveAs } from 'file-saver'; 
 import Link from 'next/link';
 import styles from "./Face2Meme.module.css"
 import Button from "@/components/ui/Button"
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+const imagePaths = [
+  "mtm_001.jpeg",
+  "mtm_002.jpeg",
+  "mtm_003.jpeg",
+  "mtm_004.jpeg",
+  "mtm_005.jpeg"
+];
 
 interface Prediction {
   id: string;
@@ -26,11 +34,12 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
   const [prediction, setPrediction] = useState<Prediction | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | undefined>();
-  const [selectedSecondImage, setSelectedSecondImage] = useState<File | undefined>();
+  const [selectedSecondImage, setSelectedSecondImage] = useState<File | string | undefined>(undefined);
   const [combinedImageUrl, setCombinedImageUrl] = useState<string | null>(null);
   const [text, setText] = useState('');
   const secondImageRef = useRef<HTMLDivElement | null>(null);
   const predictionRef = useRef<HTMLDivElement | null>(null);
+  const [imageSrc, setImageSrc] = useState<string | undefined>(undefined);
 
   // This function will be triggered when the file field change
   const imageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,6 +55,34 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
       scrollToRef(predictionRef);
     }
   };
+
+  {/* 
+  const handleImageSelect = (image: string) => {
+    setSelectedSecondImage(image);
+    setImageSrc(image);
+  };
+  */}
+
+  const handleImageSelect = async (image: string) => {
+    try {
+        const response = await fetch(`${BASE_PATH}${image}`);
+        const blob = await response.blob();
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            const base64data = reader.result as string;
+            setSelectedSecondImage(base64data);
+            setImageSrc(base64data);
+        };
+
+        reader.readAsDataURL(blob);
+    } catch (error) {
+        console.error('Error fetching and converting image to Base64:', error);
+    }
+};
+
+
+
 
   // Scroll to ref function
   const scrollToRef = (ref: React.RefObject<HTMLDivElement>) => {
@@ -65,12 +102,14 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
     setError(null);
   };
 
+  {/* 
   const handleDownload = () => {
     const imageUrl = prediction?.output;
     if (imageUrl) {
       saveAs(imageUrl, 'image.jpg');
     }
   };
+  */}
 
   const handleCombinedDownload = () => {
     if (combinedImageUrl) {
@@ -186,110 +225,118 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    console.log('selectedImage type:', typeof selectedImage);
+    console.log('selectedImage:', selectedImage);
+    console.log('selectedSecondImage type:', typeof selectedSecondImage);
+    console.log('selectedSecondImage:', selectedSecondImage);
+
     const reader1 = new FileReader();
     const reader2 = new FileReader();
 
     reader1.onload = async () => {
-      const dataUrl1 = reader1.result as string;
+        const dataUrl1 = reader1.result as string;
 
-      let dataUrl2;
-      reader2.onload = () => {
-          dataUrl2 = reader2.result as string;
-          sendRequest(dataUrl1, dataUrl2, user);
-        };
-        reader2.readAsDataURL(selectedSecondImage as Blob);
-      
+        if (selectedSecondImage instanceof File) {
+            reader2.onload = () => {
+                const dataUrl2 = reader2.result as string;
+                console.log('dataUrl2 (Base64):', dataUrl2);
+                sendRequest(dataUrl1, dataUrl2, user);
+            };
+            reader2.readAsDataURL(selectedSecondImage);
+        } else {
+            const dataUrl2 = selectedSecondImage;
+            console.log('dataUrl2 (Base64 or URL):', dataUrl2);
+            sendRequest(dataUrl1, dataUrl2, user);
+        }
     };
 
-    reader1.readAsDataURL(selectedImage as Blob);
-  };
+    if (selectedImage) {
+        reader1.readAsDataURL(selectedImage);
+    }
+};
 
-  const sendRequest = async (dataUrl1: string, dataUrl2: string, user: any) => {
+  
+  const BASE_PATH = "/";
+
+  const sendRequest = async (dataUrl1: string, dataUrl2: string | undefined, user: any) => {
     console.log("Triggered!")
+    console.log(`dataUrl2: ${dataUrl2}`)
     const response = await fetch("/api/predictions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      },
+    },
     body: JSON.stringify({
       input_image: dataUrl1,
-      target_image: dataUrl2,
+      target_image: dataUrl2 ? (dataUrl2.startsWith('data:') ? dataUrl2 : `${BASE_PATH}${dataUrl2}`) : null, // Ensure full path
       user: user
-      }),
-    });
+    }),
+  });
 
-    let prediction = await response.json();
+  let prediction = await response.json();
 
-    if (response.status !== 201) {
+  if (response.status !== 201) {
+    setError(prediction.detail ?? 'Unknown error occurred');
+    return;
+  }
+
+  setPrediction(prediction);
+
+  while (
+    prediction.status !== "succeeded" &&
+    prediction.status !== "failed"
+  ) {
+    await sleep(100);
+    const response = await fetch("/api/predictions/" + prediction.id);
+    prediction = await response.json();
+
+    if (response.status !== 200) {
       setError(prediction.detail ?? 'Unknown error occurred');
       return;
     }
-
     setPrediction(prediction);
+  }
 
-    while (
-      prediction.status !== "succeeded" &&
-      prediction.status !== "failed"
-    ) {
-      await sleep(100);
-      // console.log(prediction.status)
-      // console.log(prediction.id)
-      const response = await fetch("/api/predictions/" + prediction.id);
-      prediction = await response.json();
+  if (prediction.status === "succeeded" && prediction.output === undefined) {
+    const errorMessage = prediction.logs 
+      ? `Error: please try a different image. Details: ${prediction.logs}`
+      : 'Error: please try using a different image';
+      
+    setError(errorMessage);
+    setPrediction(null)
+    return;
+  }
 
-      if (response.status !== 200) {
-        setError(prediction.detail ?? 'Unknown error occurred');
-        return;
+  if (prediction.status === "succeeded") {
+    try {
+      const creditsResponse = await fetch("/api/predictions/reduceUserCredits", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user.id
+        },
+        body: JSON.stringify({
+          user: user,
+        }),
+      });
+
+      if (!creditsResponse.ok) {
+        throw new Error('Failed to reduce user credits');
       }
-      // console.log({prediction})
-      setPrediction(prediction);
 
-    }
+      const creditsData = await creditsResponse.json();
 
-    if (prediction.status === "succeeded" && prediction.output === undefined) {
-      //setError(prediction.logs ?? 'Error: please try using a different image');
-      const errorMessage = prediction.logs 
-        ? `Error: please try a different image. Details: ${prediction.logs}`
-        : 'Error: please try using a different image';
-        
-      setError(errorMessage);
-      setPrediction(null)
-        return;
-    }
-
-    // If the prediction is successful, invoke the reduceUserCredits endpoint
-    if (prediction.status === "succeeded") {
-      try {
-        const creditsResponse = await fetch("/api/predictions/reduceUserCredits", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-user-id": user.id
-          },
-          body: JSON.stringify({
-            user: user,
-          }),
-        });
-
-        if (!creditsResponse.ok) {
-          throw new Error('Failed to reduce user credits');
-        }
-
-        const creditsData = await creditsResponse.json();
-
-        // Check if the server returns an error
-        if (creditsData.error) {
-          throw new Error(creditsData.error);
-        }
-
-        console.log('User credits reduced successfully:', creditsData);
-      } catch (error) {
-        console.error('Error reducing user credits:', error);
-
+      if (creditsData.error) {
+        throw new Error(creditsData.error);
       }
-    }
 
-  };
+      console.log('User credits reduced successfully:', creditsData);
+    } catch (error) {
+      console.error('Error reducing user credits:', error);
+    }
+  }
+};
+
 
   // useEffect only runs on the client, so now we can safely show the UI
   useEffect(() => {
@@ -329,10 +376,43 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
           
         <div className="md:container md:mx-auto px-4 w-full lg:w-1/2 flex flex-col gap-2 text-foreground mb-4">
          <div className="mt-8">
-            <p className="text-sm text-white sm:text-lg">
-            You have { credits } credits
-            </p>
+
           </div> {/*  */}
+
+          {/* 
+          <div className="flex items-center justify-center w-full">
+            {!selectedSecondImage ? (
+              <div className="grid grid-cols-4 gap-2">
+                {imagePaths.map((image, index) => (
+                  <div key={index} className="cursor-pointer" onClick={() => handleImageSelect(image)}>
+                    <img
+                      src={image}
+                      alt={`Preview ${index + 1}`}
+                      className="w-20 h-20 md:w-32 md:h-32 object-cover rounded-lg border-2 border-gray-300 hover:border-yellow-500"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center">
+                <img
+                  src={imageSrc}
+                  alt="Selected"
+                  className="w-full h-32 object-cover rounded-lg border-2 border-blue-500"
+                />
+                <button
+                  onClick={() => setSelectedSecondImage(undefined)}
+                  className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Change Image
+                </button>
+              </div>
+              )}
+              </div>
+          */}
+
+
+
         <div className="mt-8">
             <p className="text-xl font-bold text-white sm:text-xl">
               Your image
@@ -383,6 +463,23 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
           </div>
           
           {!selectedSecondImage && (
+            <div className="grid grid-cols-4 gap-2">
+            {imagePaths.map((image, index) => (
+              <div key={index} className="cursor-pointer" onClick={() => handleImageSelect(image)}>
+                <img
+                  src={image}
+                  alt={`Preview ${index + 1}`}
+                  className="w-20 h-20 md:w-32 md:h-32 object-cover rounded-lg border-2 border-gray-300 hover:border-yellow-500"
+                />
+              </div>
+            ))}
+          </div>
+          
+          
+          )} 
+
+          {/* 
+          {!selectedSecondImage && (
           <div className="flex items-center justify-center w-full">
           <label htmlFor="dropzone-file-2" className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -396,15 +493,21 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
                 onChange={secondImageChange} />
           </label>
           </div>
-          )}
+          )} 
+          */}
+
 
           {selectedSecondImage && (
             <div className="mt-4 mb-4 flex flex-col items-center justify-center gap-4 overflow-hidden">
               <div className={styles.imageWrapper}>
                 <img className={'${styles.img}'}
-                  src={URL.createObjectURL(selectedSecondImage)}
+                  src={selectedSecondImage}
                   alt="Thumb"
                 />
+                {/*<img className={'${styles.img}'}
+                  src={URL.createObjectURL(selectedSecondImage)}
+                  alt="Thumb"
+                />*/}
               </div>
               
               <div >
