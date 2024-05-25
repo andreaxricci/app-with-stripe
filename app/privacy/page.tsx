@@ -27,7 +27,7 @@ const Terms = () => {
         <p style={{ marginBottom: '15px', lineHeight: '2' }}>
           <span style={{ fontWeight: 'bold', textDecoration: 'underline' }}>2. Definitions</span>
             <br />
-            <strong>SERVICE</strong> means the makethatmeme.com website operated by AR Web.
+            <strong>SERVICE</strong> means the makethatmeme.com website operated by Andrea Ricci.
             <br />
             <strong>PERSONAL DATA</strong> means data about a living individual who can be identified from those data (or from those and other information either in our possession or likely to come into our possession).
             <br />
