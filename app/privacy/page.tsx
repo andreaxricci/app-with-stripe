@@ -15,7 +15,7 @@ const Terms = () => {
         <p style={{ marginBottom: '15px', lineHeight: '2' }}>
           <span style={{ fontWeight: 'bold', textDecoration: 'underline' }}>1. Introduction</span>
           <br />
-          AR Web (AR Web, “us”, “we”, or “our”) operates makethatmeme.com (hereinafter referred to as “Service”).
+          Andrea Ricci (Andrea Ricci, “us”, “we”, or “our”) operates makethatmeme.com (hereinafter referred to as “Service”).
           <br />
           Our Privacy Policy governs your visit to makethatmeme.com, and explains how we collect, safeguard and disclose information that results from your use of our Service.
           <br />
