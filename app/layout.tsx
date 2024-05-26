@@ -9,11 +9,11 @@ import { getURL } from '@/utils/helpers';
 import 'styles/main.css';
 
 const meta = {
-  title: 'Personalise your memes with GenAI',
-  description: 'Use GenAI to personalise your memes.',
+  title: 'Personalize your memes with AI',
+  description: 'Get your personalized version of your favourite memes, leveraging the power of GenAI',
   cardImage: '/og.png',
   robots: 'follow, index',
-  favicon: '/favicon.ico',
+  favicon: 'meme_icon.ico',
   url: getURL()
 };
 
