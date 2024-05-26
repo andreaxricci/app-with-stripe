@@ -10,10 +10,16 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const imagePaths = [
   "mtm_001.jpeg",
-  "mtm_002.jpeg",
-  "mtm_003.jpeg",
-  "mtm_004.jpeg",
-  "mtm_005.jpeg"
+  "mtm_005.jpeg",
+  "mtm_006.png",
+  "mtm_002.png",
+  "mtm_003.png",
+  "mtm_004.png",
+  "mtm_007.jpeg",
+  "mtm_014.png",
+  "mtm_013.jpeg",
+  "mtm_008.png",
+  "mtm_010.jpeg"
 ];
 
 interface Prediction {
@@ -363,13 +369,6 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
               Meme
             </a>
         </p>
-        {credits && credits === 0 && prediction === null && (
-          <div className="sm:flex sm:flex-col sm:align-center">
-          <Link href="/pricing">
-            <Button>Buy credits</Button>
-          </Link>
-          </div>
-        )}
       
         <form onSubmit={handleSubmit} >
           <div >
@@ -521,10 +520,16 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
                   <Button onClick={removeSelectedSecondImage}>
                     Cancel
                   </Button>
-                  {credits && credits > 0 && prediction === null && (
+                  {user && credits && credits > 0 && prediction === null && (
                     <Button type="submit">Submit</Button>
                   )}
-                  {credits && credits === 0 && prediction === null && (
+                  {!user && (
+                    <Link href="/signin">
+                      <Button>Sign In</Button>
+                    </Link>
+                  )}
+
+                  {user && credits && credits < 1 && prediction === null && (
                     <Link href="/pricing">
                       <Button>Buy credits</Button>
                     </Link>

@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
   // URL to redirect to after sign in process completes
   return NextResponse.redirect(
     getStatusRedirect(
-      `${requestUrl.origin}/account`,
+      `${requestUrl.origin}/face2meme`,
       'Success!',
       'You are now signed in.'
     )

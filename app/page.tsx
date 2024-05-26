@@ -9,6 +9,7 @@ import { redirect } from 'next/navigation';
 
 export default async function Home() {
   
+  {/* 
   const supabase = createClient();
 
   const {
@@ -19,7 +20,7 @@ export default async function Home() {
     return redirect('/signin');
   }
 
-  {/* 
+  
 
   const { data: userDetails, error } = await supabase
     .from('users')
@@ -30,7 +31,7 @@ export default async function Home() {
     console.log(error);
   }
 
-  */}
+  
 
   let availableCredits = 0;
 
@@ -39,6 +40,8 @@ export default async function Home() {
   } catch (error) {
     console.error('Error fetching available credits:', error);
   }
+
+  */}
 
   {/* 
 
@@ -68,6 +71,12 @@ export default async function Home() {
       imageShadow = 'soft'
       withBackground
     >
+    <div className='flex justify-center items-center'>
+      <Link href="/face2meme">
+        <Button>Create your meme</Button>
+      </Link>
+    </div>
+    {/* 
     { availableCredits < 1 &&
       <div>
       <Link href="/pricing">
@@ -82,6 +91,7 @@ export default async function Home() {
       </Link>
       </div>
     }
+    */}
 
     </LandingPrimaryImageCtaSection> 
       
