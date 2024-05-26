@@ -27,7 +27,9 @@ const Terms = () => {
         <p style={{ marginBottom: '15px' }}>
           <span style={{ fontWeight: 'bold', textDecoration: 'underline' }}>3. Description of Service</span>
           <br />
-          Our website allows users to upload a picture of their face and an image of a known meme to generate a personalized meme with the face swap functionality. Users can also add overlay text to the generated image.
+          Our website allows users to upload a picture of their face and an image of a known meme to generate a personalized meme with the face swap functionality. Users can also add overlay text to the generated image. 
+          In order to generate images, the user must have purchased credits: each time the user generates an image, a credit is burned. 
+          Credits have a validity period of 365 days: if not utilized beforehand, they expire and won't be refunded.
         </p>
 
         <p style={{ marginBottom: '15px' }}>
