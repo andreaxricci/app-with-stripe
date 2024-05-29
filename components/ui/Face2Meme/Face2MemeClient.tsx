@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button"
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const imagePaths = [
+  "mtm_000.png",
   "mtm_001.jpeg",
   "mtm_005.jpeg",
   "mtm_006.png",
@@ -17,9 +18,12 @@ const imagePaths = [
   "mtm_004.png",
   "mtm_007.jpeg",
   "mtm_014.png",
+  "mtm_017.jpeg",
   "mtm_013.jpeg",
+  "mtm_011.jpeg",
   "mtm_008.png",
-  "mtm_010.jpeg"
+  "mtm_010.jpeg",
+  "mtm_018.jpeg"
 ];
 
 interface Prediction {
@@ -520,7 +524,7 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
                   <Button onClick={removeSelectedSecondImage}>
                     Cancel
                   </Button>
-                  {user && credits && credits > 0 && prediction === null && (
+                  {user && (credits ?? 0) > 0 && prediction === null && (
                     <Button type="submit">Submit</Button>
                   )}
                   {!user && (
@@ -529,11 +533,12 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
                     </Link>
                   )}
 
-                  {user && credits && credits < 1 && prediction === null && (
+                  {user && (credits ?? 0) < 1 && prediction === null && (
                     <Link href="/pricing">
                       <Button>Buy credits</Button>
                     </Link>
                   )}
+
                   {prediction !== null && ( 
                   <Button type="submit" disabled>Submit</Button>
                   )}
