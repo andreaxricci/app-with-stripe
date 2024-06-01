@@ -50,6 +50,7 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
   const secondImageRef = useRef<HTMLDivElement | null>(null);
   const predictionRef = useRef<HTMLDivElement | null>(null);
   const [imageSrc, setImageSrc] = useState<string | undefined>(undefined);
+  const [submitted, setSubmitted] = useState<boolean>(false);
 
   // This function will be triggered when the file field change
   const imageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -230,10 +231,12 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
     setPrediction(null);
     setError(null);
     setCombinedImageUrl(null);
+    setSubmitted(false);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSubmitted(true);
 
     console.log('selectedImage type:', typeof selectedImage);
     console.log('selectedImage:', selectedImage);
@@ -524,7 +527,7 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
                   <Button onClick={removeSelectedSecondImage}>
                     Cancel
                   </Button>
-                  {user && (credits ?? 0) > 0 && prediction === null && (
+                  {user && (credits ?? 0) > 0 && prediction === null && !submitted && (
                     <Button type="submit">Submit</Button>
                   )}
                   {!user && (
@@ -539,7 +542,7 @@ export default function Face2MemeClient({ user, credits }: Face2MemeClientProps)
                     </Link>
                   )}
 
-                  {prediction !== null && ( 
+                  {user && submitted && ( 
                   <Button type="submit" disabled>Submit</Button>
                   )}
                 </div>   
