@@ -22,7 +22,6 @@ const imagePaths = [
   "mtm_013.jpeg",
   "mtm_011.jpeg",
   "mtm_008.png",
-  "mtm_010.jpeg",
   "mtm_018.jpeg"
 ];
 
