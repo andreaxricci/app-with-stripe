@@ -23,7 +23,8 @@ const imagePaths = [
   "mtm_011.jpeg",
   "mtm_008.png",
   "mtm_018.jpeg",
-  "Untitled_01.jpg"
+  "mtm_020.png",
+  "mtm_022.png",
 ];
 
 interface Prediction {

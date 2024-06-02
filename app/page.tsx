@@ -66,7 +66,7 @@ export default async function Home() {
     <LandingPrimaryImageCtaSection
       title="Personalize your memes"
       description="Pick a photo of yours and your favourite memes and we'll generate for you a personalized version, that you can share with your friends!"
-      imageSrc="/DjangoMeme.jpeg"
+      imageSrc="/landing.jpg"
       imageAlt="Sample image"
       imageShadow = 'soft'
       withBackground
