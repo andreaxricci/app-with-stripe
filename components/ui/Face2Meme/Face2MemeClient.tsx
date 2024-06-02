@@ -19,7 +19,7 @@ const imagePaths = [
   "mtm_007.jpeg",
   "mtm_014.png",
   "mtm_017.jpeg",
-  "mtm_013.jpeg",
+  "mtm_013.png",
   "mtm_011.jpeg",
   "mtm_008.png",
   "mtm_018.jpeg",
