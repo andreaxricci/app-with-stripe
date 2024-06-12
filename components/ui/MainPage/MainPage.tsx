@@ -1,8 +1,8 @@
 import { createClient } from "@/utils/supabase/server"
-import Face2MemeClient from "./Face2MemeClient"
+import MainPageClient from "./MainPageClient"
 import { getAvailableCredits } from '@/utils/supabase/admin';
 
-export default async function Face2Meme() {
+export default async function MainPage() {
 
   const supabase = createClient();
 
@@ -20,6 +20,6 @@ export default async function Face2Meme() {
     }
   }
 
-  return <Face2MemeClient user={user} credits={availableCredits ?? 0} />;
+  return <MainPageClient user={user} credits={availableCredits ?? 0} />;
 }
 

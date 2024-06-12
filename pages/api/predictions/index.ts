@@ -8,7 +8,7 @@ const handler = async (req: NextRequest): Promise<Response> => {
       return new Response('Method Not Allowed', { status: 405 });
     }
 
-    const { input_image, target_image, user } = await req.json();
+    const { input_image, input_prompt, user } = await req.json();
 
     const res = await fetch("https://api.replicate.com/v1/predictions", {
     headers: {
@@ -19,12 +19,15 @@ const handler = async (req: NextRequest): Promise<Response> => {
     body: JSON.stringify({
         // Pinned to a specific version of Stable Diffusion
         // See https://replicate.com/stability-ai/sdxl
-        version: "c2d783366e8d32e6e82c40682fab6b4c23b9c6eff2692c0cf7585fc16c238cfe",
+        version: "f71e6abfc606137e777d505cbb2d166de45fc5cfcc847a1d07e97af63a03748d",
     
         // This is the text prompt that will be submitted by a form on the frontend
         input: { 
-            swap_image: input_image,
-            target_image: target_image
+            width: 1156,
+            height: 768,
+            prompt: input_prompt,
+            negative_prompt: "hands, pastels, spots, photo, text, watermark",
+            image: input_image
         },
         }),
     });
