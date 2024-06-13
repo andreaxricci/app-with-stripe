@@ -72,8 +72,8 @@ export default async function Home() {
       withBackground
     >
     <div className='flex justify-center items-center'>
-      <Link href="/face2meme">
-        <Button>Create your meme</Button>
+      <Link href="/mainpage">
+        <Button>Create your image</Button>
       </Link>
     </div>
     {/* 
